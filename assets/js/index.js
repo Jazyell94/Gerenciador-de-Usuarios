@@ -21,7 +21,6 @@ function showMessage(message, type = "success") {
     statusMessage.style.display = "flex";
   }, 100);
 
-  
   setTimeout(() => {
     hideMessage();
   }, 5000);
@@ -61,6 +60,9 @@ async function fetchUsers() {
                         <h3>${user.nome}</h3>
                         <p>${user.email}</p>
                         <span class="user-id">ID: ${user.id}</span>
+                        <button onclick="editUser (${user.id}, '${user.nome}', '${user.email}')">Editar</button>
+                        <button onclick="deleteUser (${user.id})">Excluir</button>
+                        <button onclick="deactivateUser (${user.id})">Desativar</button>
                     `;
       userList.appendChild(userCard);
     });
@@ -99,6 +101,85 @@ async function createUser(userData) {
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = "Criar Usuário";
+  }
+}
+
+// Editar usuário
+async function editUser(id, nome, email) {
+  const newNome = prompt("Novo nome:", nome);
+  const newEmail = prompt("Novo email:", email);
+
+  if (newNome === null || newEmail === null) {
+    return; // Cancelado
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/usuarios/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nome: newNome, email: newEmail }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Erro ao editar usuário");
+    }
+
+    showMessage("Usuário editado com sucesso!", "success");
+    fetchUsers(); // Atualiza a lista
+  } catch (error) {
+    console.error("Erro:", error);
+    showMessage(error.message, "error");
+  }
+}
+
+// Excluir usuário
+async function deleteUser(id) {
+  if (!confirm("Tem certeza que deseja excluir este usuário?")) {
+    return; // Cancelado
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/usuarios/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Erro ao excluir usuário");
+    }
+
+    showMessage("Usuário excluído com sucesso!", "success");
+    fetchUsers(); // Atualiza a lista
+  } catch (error) {
+    console.error("Erro:", error);
+    showMessage(error.message, "error");
+  }
+}
+
+// Desativar usuário
+async function deactivateUser(id) {
+  if (!confirm("Tem certeza que deseja desativar este usuário?")) {
+    return; // Cancelado
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/usuarios/${id}/desativar`, {
+      method: "PATCH",
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Erro ao desativar usuário");
+    }
+
+    showMessage("Usuário desativado com sucesso!", "success");
+    fetchUsers(); // Atualiza a lista
+  } catch (error) {
+    console.error("Erro:", error);
+    showMessage(error.message, "error");
   }
 }
 
