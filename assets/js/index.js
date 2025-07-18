@@ -260,12 +260,17 @@ async function handleUserSearch(searchTerm) {
     const response = await fetch(`${API_BASE_URL}/usuarios`);
     const users = await response.json();
 
-    const filtered = users.filter(
-      (user) =>
-        user.nome.toLowerCase().includes(search) ||
-        user.email.toLowerCase().includes(search) ||
-        user.telefone.toLowerCase().includes(search) // Filtrando pelo telefone
-    );
+    const filtered = users.filter((user) => {
+      const nome = user.nome || "";
+      const email = user.email || "";
+      const telefone = user.telefone || "";
+
+      return (
+        nome.toLowerCase().includes(search) ||
+        email.toLowerCase().includes(search) ||
+        telefone.toLowerCase().includes(search)
+      );
+    });
 
     renderUserList(filtered, true); // true = mostrar botões
   } catch (err) {
