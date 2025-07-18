@@ -14,18 +14,23 @@
       </header>
 
       <div class="main-content">
-        <section class="search-section">
-          <div class="form-group">
-            <input type="text" id="searchUser" placeholder="Buscar usuários..." />
-            <button id="searchBtn"><i class="search-icon"></i></button>
-          </div>
-          <button id="addUserBtn" class="round-btn">+</button>
+        <section class="form-section">
+          <h2>Criar Novo Usuário</h2>
+          <form id="userForm">
+            <div class="form-group">
+              <label for="nome">Nome:</label>
+              <input type="text" id="nome" name="nome" required />
+            </div>
+            <div class="form-group">
+              <label for="email">Email:</label>
+              <input type="email" id="email" name="email" required />
+            </div>
+            <button type="submit" id="submitBtn">Criar Usuário</button>
+          </form>
         </section>
 
-        <section class="list-section hidden">
-          <div class="list-header">
-            <h2>Lista de Usuários</h2>
-          </div>
+        <section class="list-section">
+          <h2>Lista de Usuários</h2>
           <div id="userList" class="user-grid">
             <div class="loading">Carregando usuários...</div>
           </div>
