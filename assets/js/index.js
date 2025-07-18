@@ -43,24 +43,33 @@ function renderUserList(users, showActions = false) {
     const userCard = document.createElement("div");
     userCard.className = "user-card";
     userCard.innerHTML = `
-      <h3>${user.nome}</h3>
-      <p>${user.email}</p>
-      <span class="user-id">ID: ${user.id}</span>
-      <p>Status: ${user.status == 1 ? "Ativo" : "Inativo"}</p>
-      ${showActions ? `
-        <button onclick="editUser(${user.id}, '${user.nome}', '${user.email}')">Editar</button>
-        <button onclick="deleteUser(${user.id})">Excluir</button>
-        ${
-          user.status == 1
-            ? `<button onclick="deactivateUser(${user.id})">Desativar</button>`
-            : `<button onclick="reactivateUser(${user.id})">Reativar</button>`
-        }
-      ` : ''}
-    `;
+  <h3>${user.nome}</h3>
+  <p>${user.email}</p>
+  <span class="user-id">ID: ${user.id}</span>
+  <p>Status: ${user.status == 1 ? "Ativo" : "Inativo"}</p>
+  ${
+    showActions
+      ? `
+    <div class="user-actions">
+      <button class="btn btn-edit" onclick="editUser(${user.id}, '${
+          user.nome
+        }', '${user.email}')">Editar</button>
+      <button class="btn btn-delete" onclick="deleteUser(${
+        user.id
+      })">Excluir</button>
+      ${
+        user.status == 1
+          ? `<button class="btn btn-deactivate" onclick="deactivateUser(${user.id})">Desativar</button>`
+          : `<button class="btn btn-reactivate" onclick="reactivateUser(${user.id})">Reativar</button>`
+      }
+    </div>
+  `:""
+  }
+`;
+
     userList.appendChild(userCard);
   });
 }
-
 
 // Criar novo usuário
 async function createUser(userData) {
@@ -178,7 +187,6 @@ async function fetchUsers() {
   }
 }
 
-
 // Envio do formulário
 userForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -189,13 +197,6 @@ userForm.addEventListener("submit", (e) => {
     return;
   }
   createUser({ nome, email });
-});
-
-// Mostrar/ocultar formulário
-document.getElementById("toggleFormBtn").addEventListener("click", () => {
-  const formSection = document.getElementById("formSection");
-  formSection.style.display =
-    formSection.style.display === "none" ? "block" : "none";
 });
 
 // Função debounce
@@ -231,7 +232,6 @@ async function handleUserSearch(searchTerm) {
   }
 }
 
-
 // Aplica debounce de 300ms
 const debouncedSearch = debounce((e) => handleUserSearch(e.target.value), 300);
 
@@ -241,11 +241,3 @@ document
 
 // Inicializar
 document.addEventListener("DOMContentLoaded", fetchUsers);
-
-const searchBox = document.querySelector(".search-box");
-const searchToggleBtn = document.getElementById("searchToggleBtn");
-
-searchToggleBtn.addEventListener("click", () => {
-  searchBox.style.display =
-    searchBox.style.display === "none" ? "block" : "none";
-});

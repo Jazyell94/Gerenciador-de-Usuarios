@@ -24,7 +24,8 @@ body {
 }
 
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
+  height: 800px;
   margin: 0 auto;
   background: white;
   border-radius: 8px;
@@ -56,6 +57,7 @@ h1 {
   gap: 20px;
 }
 
+.search-section,
 .form-section,
 .list-section {
   flex: 1;
@@ -64,6 +66,37 @@ h1 {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  margin: 10px;
+}
+
+.form-section button {
+  background-color: var(--secondary-color);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  transition: background-color 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  transform: scale(1);
+}
+
+.form-section button:hover {
+  background-color: var(--text-color);
+  transform: scale(1.05);
+}
+
+.form-section button:active {
+  background-color: var(--text-color);
+  transform: scale(0.97);
+}
+
+.form-section button:disabled {
+  background-color: var(--secondary-color);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: scale(1);
 }
 
 h2 {
@@ -92,48 +125,29 @@ input[type="email"] {
   font-size: 1rem;
 }
 
-button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
-}
-
-button:hover {
-  background-color: #2980b9;
-}
-
-button:disabled {
-  background-color: var(--dark-gray);
-  cursor: not-allowed;
-}
-
-/* Estilos para os botões de ação na lista de usuários */
-.user-card button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  margin-right: 5px; /* Espaçamento entre os botões */
-  transition: background-color 0.3s;
-}
-
-.user-card button:hover {
-  background-color: #2980b9;
-}
-
 .user-grid {
+  max-width: 500px;
+  max-height: 520px;
+  overflow: auto;
+  padding-right: 10px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 15px;
   margin-top: 20px;
+}
+
+/* estilização da barra de rolagem */
+.user-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.user-grid::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+}
+
+.user-grid::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
 }
 
 .user-card {
@@ -146,7 +160,7 @@ button:disabled {
 
 .user-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow:  0px 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 .user-card h3 {
@@ -163,6 +177,55 @@ button:disabled {
   font-size: 0.8rem;
   color: var(--medium-gray);
 }
+
+
+
+
+
+.btn {
+  padding: 0.4rem 0.8rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Estilos específicos */
+.btn-edit {
+  background-color: #3b82f6; /* azul */
+  color: white;
+}
+.btn-edit:hover {
+  background-color: #2563eb;
+}
+
+.btn-delete {
+  background-color: #ef4444; /* vermelho */
+  color: white;
+}
+.btn-delete:hover {
+  background-color: #dc2626;
+}
+
+.btn-deactivate {
+  background-color: #f59e0b; /* amarelo */
+  color: white;
+}
+.btn-deactivate:hover {
+  background-color: #d97706;
+}
+
+.btn-reactivate {
+  background-color: #10b981; /* verde */
+  color: white;
+}
+.btn-reactivate:hover {
+  background-color: #059669;
+}
+
+
+
 
 .status-message {
   position: fixed;
@@ -235,38 +298,7 @@ footer {
   }
 }
 
-
-
-.plus-button {
-  font-size: 24px;
-  padding: 5px 15px;
-  border-radius: 50%;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
 .top-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.search-box {
-  display: flex;
-  align-items: center;
-}
-
-.search-box input {
-  padding: 6px 10px;
-  font-size: 14px;
-}
-
-.search-box button {
-  padding: 6px 12px;
-  font-size: 16px;
-  margin-left: 5px;
-  cursor: pointer;
+  width: 650px;
+  height: 100vh;
 }

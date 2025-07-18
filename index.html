@@ -10,40 +10,40 @@
     <div class="container">
       <header>
         <h1>Gerenciador de Usuários</h1>
-        <p class="subtitle">Só pra brincar um pouquinho</p>
+        <p class="subtitle">
+          Sistema para gerenciamento de usuarios de forma geral
+        </p>
       </header>
 
       <div class="main-content">
-        <!-- Botão para exibir formulário -->
         <div class="top-controls">
-          <button id="toggleFormBtn" class="plus-button">+</button>
-
-          <div class="search-box" style="display: none">
+          <!-- buscar usuarios -->
+          <section class="search-section">
+            <h2>Buscar usuários</h2>
             <input
               type="text"
               id="searchInput"
               placeholder="Buscar usuário por nome ou email..."
             />
-          </div>
-          <button id="searchToggleBtn" class="search-toggle">🔍</button>
+          </section>
+
+          <!-- Formulário  -->
+          <section class="form-section" id="formSection">
+            <h2>Criar Novo Usuário</h2>
+            <form id="userForm">
+              <div class="form-group">
+                <label for="nome">Nome:</label>
+                <input type="text" id="nome" name="nome" required />
+              </div>
+              <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+              </div>
+              <button type="submit" id="submitBtn">Criar Usuário</button>
+            </form>
+          </section>
         </div>
-
-        <!-- Formulário oculto por padrão -->
-        <section class="form-section" id="formSection" style="display: none">
-          <h2>Criar Novo Usuário</h2>
-          <form id="userForm">
-            <div class="form-group">
-              <label for="nome">Nome:</label>
-              <input type="text" id="nome" name="nome" required />
-            </div>
-            <div class="form-group">
-              <label for="email">Email:</label>
-              <input type="email" id="email" name="email" required />
-            </div>
-            <button type="submit" id="submitBtn">Criar Usuário</button>
-          </form>
-        </section>
-
+        <!-- lista de usuarios -->
         <section class="list-section">
           <h2>Lista de Usuários</h2>
           <div id="userList" class="user-grid">
