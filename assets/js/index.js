@@ -32,7 +32,7 @@ function hideMessage() {
 closeMessage.addEventListener("click", hideMessage);
 
 // Renderiza lista de usuários
-function renderUserList(users) {
+function renderUserList(users, showActions = false) {
   userList.innerHTML = "";
   if (users.length === 0) {
     userList.innerHTML = "<p>Nenhum usuário encontrado</p>";
@@ -47,19 +47,20 @@ function renderUserList(users) {
       <p>${user.email}</p>
       <span class="user-id">ID: ${user.id}</span>
       <p>Status: ${user.status == 1 ? "Ativo" : "Inativo"}</p>
-      <button onclick="editUser(${user.id}, '${user.nome}', '${
-      user.email
-    }')">Editar</button>
-      <button onclick="deleteUser(${user.id})">Excluir</button>
-      ${
-        user.status == 1
-          ? `<button onclick="deactivateUser(${user.id})">Desativar</button>`
-          : `<button onclick="reactivateUser(${user.id})">Reativar</button>`
-      }
+      ${showActions ? `
+        <button onclick="editUser(${user.id}, '${user.nome}', '${user.email}')">Editar</button>
+        <button onclick="deleteUser(${user.id})">Excluir</button>
+        ${
+          user.status == 1
+            ? `<button onclick="deactivateUser(${user.id})">Desativar</button>`
+            : `<button onclick="reactivateUser(${user.id})">Reativar</button>`
+        }
+      ` : ''}
     `;
     userList.appendChild(userCard);
   });
 }
+
 
 // Criar novo usuário
 async function createUser(userData) {
@@ -167,6 +168,16 @@ async function reactivateUser(id) {
     showMessage(error.message, "error");
   }
 }
+async function fetchUsers() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/usuarios/status/1`);
+    const users = await response.json();
+    renderUserList(users, false); // false = não mostrar botões
+  } catch (error) {
+    console.error("Erro ao buscar usuários:", error);
+  }
+}
+
 
 // Envio do formulário
 userForm.addEventListener("submit", (e) => {
@@ -199,17 +210,13 @@ function debounce(func, delay) {
 // Função de busca de usuários
 async function handleUserSearch(searchTerm) {
   const search = searchTerm.trim().toLowerCase();
-  const userList = document.getElementById("userList");
-
   if (!search) {
-    fetchUsers(); // Mostra todos
+    fetchUsers();
     return;
   }
 
   try {
-    const response = await fetch(
-      "https://api-production-554a.up.railway.app/usuarios"
-    );
+    const response = await fetch(`${API_BASE_URL}/usuarios`);
     const users = await response.json();
 
     const filtered = users.filter(
@@ -218,37 +225,12 @@ async function handleUserSearch(searchTerm) {
         user.email.toLowerCase().includes(search)
     );
 
-    userList.innerHTML = "";
-
-    if (filtered.length === 0) {
-      userList.innerHTML = "<p>Nenhum usuário encontrado</p>";
-      return;
-    }
-
-    filtered.forEach((user) => {
-      const card = document.createElement("div");
-      card.className = "user-card";
-      card.innerHTML = `
-          <h3>${user.nome}</h3>
-          <p>${user.email}</p>
-          <span class="user-id">ID: ${user.id}</span>
-          <p>Status: ${user.status == 1 ? "Ativo" : "Inativo"}</p>
-          <button onclick="editUser(${user.id}, '${user.nome}', '${
-        user.email
-      }')">Editar</button>
-          <button onclick="deleteUser(${user.id})">Excluir</button>
-          ${
-            user.status == 1
-              ? `<button onclick="deactivateUser(${user.id})">Desativar</button>`
-              : `<button onclick="reactivateUser(${user.id})">Reativar</button>`
-          }
-        `;
-      userList.appendChild(card);
-    });
+    renderUserList(filtered, true); // true = mostrar botões
   } catch (err) {
     console.error("Erro na busca:", err);
   }
 }
+
 
 // Aplica debounce de 300ms
 const debouncedSearch = debounce((e) => handleUserSearch(e.target.value), 300);
@@ -259,3 +241,11 @@ document
 
 // Inicializar
 document.addEventListener("DOMContentLoaded", fetchUsers);
+
+const searchBox = document.querySelector(".search-box");
+const searchToggleBtn = document.getElementById("searchToggleBtn");
+
+searchToggleBtn.addEventListener("click", () => {
+  searchBox.style.display =
+    searchBox.style.display === "none" ? "block" : "none";
+});
