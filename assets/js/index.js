@@ -43,29 +43,31 @@ function renderUserList(users, showActions = false) {
     const userCard = document.createElement("div");
     userCard.className = "user-card";
     userCard.innerHTML = `
-  <h3>${user.nome}</h3>
-  <p>${user.email}</p>
-  <span class="user-id">ID: ${user.id}</span>
-  <p>Status: ${user.status == 1 ? "Ativo" : "Inativo"}</p>
-  ${
-    showActions
-      ? `
-    <div class="user-actions">
-      <button class="btn btn-edit" onclick="editUser(${user.id}, '${
-          user.nome
-        }', '${user.email}')">Editar</button>
-      <button class="btn btn-delete" onclick="deleteUser(${
-        user.id
-      })">Excluir</button>
+      <h3>${user.nome}</h3>
+      <p>${user.email}</p>
+      <p>${user.telefone}</p>
+      <span class="user-id">ID: ${user.id}</span>
+      <p>Status: ${user.status == 1 ? "Ativo" : "Inativo"}</p>
       ${
-        user.status == 1
-          ? `<button class="btn btn-deactivate" onclick="deactivateUser(${user.id})">Desativar</button>`
-          : `<button class="btn btn-reactivate" onclick="reactivateUser(${user.id})">Reativar</button>`
+        showActions
+          ? `
+      <div class="user-actions">
+        <button class="btn btn-edit" onclick="editUser(${user.id}, '${
+              user.nome
+            }', '${user.email}', '${user.telefone}')">Editar</button>
+        <button class="btn btn-delete" onclick="deleteUser(${
+          user.id
+        })">Excluir</button>
+        ${
+          user.status == 1
+            ? `<button class="btn btn-deactivate" onclick="deactivateUser(${user.id})">Desativar</button>`
+            : `<button class="btn btn-reactivate" onclick="reactivateUser(${user.id})">Reativar</button>`
+        }
+      </div>
+    `
+          : ""
       }
-    </div>
-  `:""
-  }
-`;
+    `;
 
     userList.appendChild(userCard);
   });
@@ -97,17 +99,24 @@ async function createUser(userData) {
   }
 }
 
+
+
 // Editar usuário
-async function editUser(id, nome, email) {
+async function editUser(id, nome, email, telefone) {
   const newNome = prompt("Novo nome:", nome);
   const newEmail = prompt("Novo email:", email);
-  if (newNome === null || newEmail === null) return;
+  const newTelefone = prompt("Novo telefone:", telefone);
+  if (newNome === null || newEmail === null || newTelefone === null) return;
 
   try {
     const response = await fetch(`${API_BASE_URL}/usuarios/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome: newNome, email: newEmail }),
+      body: JSON.stringify({
+        nome: newNome,
+        email: newEmail,
+        telefone: newTelefone,
+      }),
     });
     if (!response.ok) {
       const errorData = await response.json();
@@ -177,6 +186,7 @@ async function reactivateUser(id) {
     showMessage(error.message, "error");
   }
 }
+
 async function fetchUsers() {
   try {
     const response = await fetch(`${API_BASE_URL}/usuarios/status/1`);
@@ -187,17 +197,47 @@ async function fetchUsers() {
   }
 }
 
+function formatTelefone(telefone) {
+  const nums = telefone.replace(/\D/g, "");
+  if (nums.length === 11) {
+    return nums.replace(/^(\d{2})(\d{5})(\d{4})$/, "($1) $2-$3");
+  } else if (nums.length === 10) {
+    return nums.replace(/^(\d{2})(\d{4})(\d{4})$/, "($1) $2-$3");
+  } else {
+    return telefone;
+  }
+}
+
 // Envio do formulário
 userForm.addEventListener("submit", (e) => {
   e.preventDefault();
+
   const nome = document.getElementById("nome").value.trim();
-  const email = document.getElementById("email").value.trim();
-  if (!nome || !email) {
-    showMessage("Nome e email são obrigatórios", "error");
+  const contato = document.getElementById("contato").value.trim();
+
+  if (!nome || !contato) {
+    showMessage("Informe o nome e um e-mail ou telefone.", "error");
     return;
   }
-  createUser({ nome, email });
+
+  // Regex simples para validar email
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const isEmail = emailRegex.test(contato);
+
+  let userData = { nome };
+
+  if (isEmail) {
+    userData.email = contato;
+    userData.telefone = "telefone não informado"; // Mensagem para telefone
+  } else {
+    userData.telefone = formatTelefone(contato); // Chamar a função aqui!
+    userData.email = "e-mail não informado"; // Mensagem para email
+  }
+
+  createUser(userData);
 });
+
+
 
 // Função debounce
 function debounce(func, delay) {
@@ -223,7 +263,8 @@ async function handleUserSearch(searchTerm) {
     const filtered = users.filter(
       (user) =>
         user.nome.toLowerCase().includes(search) ||
-        user.email.toLowerCase().includes(search)
+        user.email.toLowerCase().includes(search) ||
+        user.telefone.toLowerCase().includes(search) // Filtrando pelo telefone
     );
 
     renderUserList(filtered, true); // true = mostrar botões
@@ -241,3 +282,6 @@ document
 
 // Inicializar
 document.addEventListener("DOMContentLoaded", fetchUsers);
+
+
+
