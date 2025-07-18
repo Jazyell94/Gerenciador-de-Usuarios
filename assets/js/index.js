@@ -73,7 +73,7 @@ async function fetchUsers() {
 }
 
 // Criar novo usuário
-async function createUser(userData) {
+async function createUser (userData) {
   try {
     submitBtn.disabled = true;
     submitBtn.textContent = "Enviando...";
@@ -91,7 +91,7 @@ async function createUser(userData) {
       throw new Error(errorData.error || "Erro ao criar usuário");
     }
 
-    const newUser = await response.json();
+    const newUser  = await response.json();
     showMessage("Usuário criado com sucesso!", "success");
     userForm.reset();
     fetchUsers(); // Atualiza a lista
@@ -105,7 +105,7 @@ async function createUser(userData) {
 }
 
 // Editar usuário
-async function editUser(id, nome, email) {
+async function editUser (id, nome, email) {
   const newNome = prompt("Novo nome:", nome);
   const newEmail = prompt("Novo email:", email);
 
@@ -136,7 +136,7 @@ async function editUser(id, nome, email) {
 }
 
 // Excluir usuário
-async function deleteUser(id) {
+async function deleteUser (id) {
   if (!confirm("Tem certeza que deseja excluir este usuário?")) {
     return; // Cancelado
   }
@@ -160,7 +160,7 @@ async function deleteUser(id) {
 }
 
 // Desativar usuário
-async function deactivateUser(id) {
+async function deactivateUser (id) {
   if (!confirm("Tem certeza que deseja desativar este usuário?")) {
     return; // Cancelado
   }
@@ -195,7 +195,7 @@ userForm.addEventListener("submit", (e) => {
     return;
   }
 
-  createUser({ nome, email });
+  createUser ({ nome, email });
 });
 
 // Inicializa a aplicação
