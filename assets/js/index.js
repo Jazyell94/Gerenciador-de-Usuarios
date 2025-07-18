@@ -238,11 +238,11 @@ userForm.addEventListener("submit", (e) => {
   let userData = { nome };
 
   if (isEmail) {
-    userData.email = validarEmail(contato);
-    userData.telefone = "telefone não informado"; // Mensagem para telefone
+    userData.email = contato;   // <-- Corrigido aqui
+    userData.telefone = null;   // campo vazio como null
   } else {
-    userData.telefone = formatTelefone(contato); // Chamar a função aqui!
-    userData.email = "e-mail não informado"; // Mensagem para email
+    userData.telefone = formatTelefone(contato);
+    userData.email = null;      // campo vazio como null
   }
 
   createUser(userData);
