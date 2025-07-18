@@ -208,6 +208,17 @@ function formatTelefone(telefone) {
   }
 }
 
+function validarEmail(email) {
+  const re = /\S+@\S+\.\S+/;
+  return re.test(email);
+}
+
+// No submit do form
+if (!validarEmail(email)) {
+  alert('Email inválido!');
+  return;
+}
+
 // Envio do formulário
 userForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -227,7 +238,7 @@ userForm.addEventListener("submit", (e) => {
   let userData = { nome };
 
   if (isEmail) {
-    userData.email = contato;
+    userData.email = validarEmail(contato);
     userData.telefone = "telefone não informado"; // Mensagem para telefone
   } else {
     userData.telefone = formatTelefone(contato); // Chamar a função aqui!
