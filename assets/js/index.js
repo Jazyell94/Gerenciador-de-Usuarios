@@ -1,4 +1,4 @@
-// Configuração - Link da api no railway
+// Configuração - Link da API no Railway
 const API_BASE_URL = "https://api-production-554a.up.railway.app";
 
 // Elementos do DOM
@@ -13,88 +13,71 @@ const apiUrlSpan = document.getElementById("apiUrl");
 // Mostra a URL da API no footer da pagina
 apiUrlSpan.textContent = API_BASE_URL;
 
-// Mostrar mensagem de status na lista de usuarios
+// Mostrar mensagem de status
 function showMessage(message, type = "success") {
   messageText.textContent = message;
   statusMessage.className = `status-message ${type}`;
   setTimeout(() => {
     statusMessage.style.display = "flex";
   }, 100);
-
   setTimeout(() => {
     hideMessage();
   }, 5000);
 }
 
-// Esconder mensagem de status
+// Esconder mensagem
 function hideMessage() {
   statusMessage.style.display = "none";
 }
-
-// Fechar mensagem ao clicar no botão
 closeMessage.addEventListener("click", hideMessage);
 
-// Buscar todos os usuários
-async function fetchUsers() {
-  try {
-    userList.innerHTML = '<div class="loading">Carregando usuários...</div>';
-
-    const response = await fetch(`${API_BASE_URL}/usuarios`);
-
-    if (!response.ok) {
-      throw new Error("Erro ao buscar usuários");
-    }
-
-    const users = await response.json();
-
-    if (users.length === 0) {
-      userList.innerHTML = "<p>Nenhum usuário cadastrado</p>";
-      return;
-    }
-
-    userList.innerHTML = "";
-    users.forEach((user) => {
-      const userCard = document.createElement("div");
-      userCard.className = "user-card";
-      userCard.innerHTML = `
-                        <h3>${user.nome}</h3>
-                        <p>${user.email}</p>
-                        <span class="user-id">ID: ${user.id}</span>
-                        <button onclick="editUser (${user.id}, '${user.nome}', '${user.email}')">Editar</button>
-                        <button onclick="deleteUser (${user.id})">Excluir</button>
-                        <button onclick="deactivateUser (${user.id})">Desativar</button>
-                    `;
-      userList.appendChild(userCard);
-    });
-  } catch (error) {
-    console.error("Erro:", error);
-    userList.innerHTML = `<p class="error">${error.message}</p>`;
+// Renderiza lista de usuários
+function renderUserList(users) {
+  userList.innerHTML = "";
+  if (users.length === 0) {
+    userList.innerHTML = "<p>Nenhum usuário encontrado</p>";
+    return;
   }
+
+  users.forEach((user) => {
+    const userCard = document.createElement("div");
+    userCard.className = "user-card";
+    userCard.innerHTML = `
+      <h3>${user.nome}</h3>
+      <p>${user.email}</p>
+      <span class="user-id">ID: ${user.id}</span>
+      <p>Status: ${user.status == 1 ? "Ativo" : "Inativo"}</p>
+      <button onclick="editUser(${user.id}, '${user.nome}', '${
+      user.email
+    }')">Editar</button>
+      <button onclick="deleteUser(${user.id})">Excluir</button>
+      ${
+        user.status == 1
+          ? `<button onclick="deactivateUser(${user.id})">Desativar</button>`
+          : `<button onclick="reactivateUser(${user.id})">Reativar</button>`
+      }
+    `;
+    userList.appendChild(userCard);
+  });
 }
 
 // Criar novo usuário
-async function createUser (userData) {
+async function createUser(userData) {
   try {
     submitBtn.disabled = true;
     submitBtn.textContent = "Enviando...";
-
     const response = await fetch(`${API_BASE_URL}/usuarios`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
     });
-
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Erro ao criar usuário");
     }
-
-    const newUser  = await response.json();
     showMessage("Usuário criado com sucesso!", "success");
     userForm.reset();
-    fetchUsers(); // Atualiza a lista
+    fetchUsers();
   } catch (error) {
     console.error("Erro:", error);
     showMessage(error.message, "error");
@@ -105,30 +88,23 @@ async function createUser (userData) {
 }
 
 // Editar usuário
-async function editUser (id, nome, email) {
+async function editUser(id, nome, email) {
   const newNome = prompt("Novo nome:", nome);
   const newEmail = prompt("Novo email:", email);
-
-  if (newNome === null || newEmail === null) {
-    return; // Cancelado
-  }
+  if (newNome === null || newEmail === null) return;
 
   try {
     const response = await fetch(`${API_BASE_URL}/usuarios/${id}`, {
       method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome: newNome, email: newEmail }),
     });
-
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Erro ao editar usuário");
     }
-
     showMessage("Usuário editado com sucesso!", "success");
-    fetchUsers(); // Atualiza a lista
+    fetchUsers();
   } catch (error) {
     console.error("Erro:", error);
     showMessage(error.message, "error");
@@ -136,23 +112,18 @@ async function editUser (id, nome, email) {
 }
 
 // Excluir usuário
-async function deleteUser (id) {
-  if (!confirm("Tem certeza que deseja excluir este usuário?")) {
-    return; // Cancelado
-  }
-
+async function deleteUser(id) {
+  if (!confirm("Tem certeza que deseja excluir este usuário?")) return;
   try {
     const response = await fetch(`${API_BASE_URL}/usuarios/${id}`, {
       method: "DELETE",
     });
-
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Erro ao excluir usuário");
     }
-
     showMessage("Usuário excluído com sucesso!", "success");
-    fetchUsers(); // Atualiza a lista
+    fetchUsers();
   } catch (error) {
     console.error("Erro:", error);
     showMessage(error.message, "error");
@@ -160,43 +131,131 @@ async function deleteUser (id) {
 }
 
 // Desativar usuário
-async function deactivateUser (id) {
-  if (!confirm("Tem certeza que deseja desativar este usuário?")) {
-    return; // Cancelado
-  }
-
+async function deactivateUser(id) {
+  if (!confirm("Deseja desativar este usuário?")) return;
   try {
     const response = await fetch(`${API_BASE_URL}/usuarios/${id}/desativar`, {
       method: "PATCH",
     });
-
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.error || "Erro ao desativar usuário");
     }
-
     showMessage("Usuário desativado com sucesso!", "success");
-    fetchUsers(); // Atualiza a lista
+    fetchUsers();
   } catch (error) {
     console.error("Erro:", error);
     showMessage(error.message, "error");
   }
 }
 
-// Manipular envio do formulário
+// Reativar usuário
+async function reactivateUser(id) {
+  if (!confirm("Deseja reativar este usuário?")) return;
+  try {
+    const response = await fetch(`${API_BASE_URL}/usuarios/${id}/reativar`, {
+      method: "PATCH",
+    });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Erro ao reativar usuário");
+    }
+    showMessage("Usuário reativado com sucesso!", "success");
+    fetchUsers();
+  } catch (error) {
+    console.error("Erro:", error);
+    showMessage(error.message, "error");
+  }
+}
+
+// Envio do formulário
 userForm.addEventListener("submit", (e) => {
   e.preventDefault();
-
   const nome = document.getElementById("nome").value.trim();
   const email = document.getElementById("email").value.trim();
-
   if (!nome || !email) {
     showMessage("Nome e email são obrigatórios", "error");
     return;
   }
-
-  createUser ({ nome, email });
+  createUser({ nome, email });
 });
 
-// Inicializa a aplicação
+// Mostrar/ocultar formulário
+document.getElementById("toggleFormBtn").addEventListener("click", () => {
+  const formSection = document.getElementById("formSection");
+  formSection.style.display =
+    formSection.style.display === "none" ? "block" : "none";
+});
+
+// Função debounce
+function debounce(func, delay) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+}
+
+// Função de busca de usuários
+async function handleUserSearch(searchTerm) {
+  const search = searchTerm.trim().toLowerCase();
+  const userList = document.getElementById("userList");
+
+  if (!search) {
+    fetchUsers(); // Mostra todos
+    return;
+  }
+
+  try {
+    const response = await fetch(
+      "https://api-production-554a.up.railway.app/usuarios"
+    );
+    const users = await response.json();
+
+    const filtered = users.filter(
+      (user) =>
+        user.nome.toLowerCase().includes(search) ||
+        user.email.toLowerCase().includes(search)
+    );
+
+    userList.innerHTML = "";
+
+    if (filtered.length === 0) {
+      userList.innerHTML = "<p>Nenhum usuário encontrado</p>";
+      return;
+    }
+
+    filtered.forEach((user) => {
+      const card = document.createElement("div");
+      card.className = "user-card";
+      card.innerHTML = `
+          <h3>${user.nome}</h3>
+          <p>${user.email}</p>
+          <span class="user-id">ID: ${user.id}</span>
+          <p>Status: ${user.status == 1 ? "Ativo" : "Inativo"}</p>
+          <button onclick="editUser(${user.id}, '${user.nome}', '${
+        user.email
+      }')">Editar</button>
+          <button onclick="deleteUser(${user.id})">Excluir</button>
+          ${
+            user.status == 1
+              ? `<button onclick="deactivateUser(${user.id})">Desativar</button>`
+              : `<button onclick="reactivateUser(${user.id})">Reativar</button>`
+          }
+        `;
+      userList.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Erro na busca:", err);
+  }
+}
+
+// Aplica debounce de 300ms
+const debouncedSearch = debounce((e) => handleUserSearch(e.target.value), 300);
+
+document
+  .getElementById("searchInput")
+  .addEventListener("input", debouncedSearch);
+
+// Inicializar
 document.addEventListener("DOMContentLoaded", fetchUsers);

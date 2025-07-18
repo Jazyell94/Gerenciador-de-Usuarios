@@ -14,7 +14,19 @@
       </header>
 
       <div class="main-content">
-        <section class="form-section">
+
+        <!-- Botão para exibir formulário -->
+        <div class="top-controls">
+          <button id="toggleFormBtn" class="plus-button">+</button>
+
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Buscar usuário por nome ou email..." />
+            <button id="searchBtn">🔍</button>
+          </div>
+        </div>
+
+        <!-- Formulário oculto por padrão -->
+        <section class="form-section" id="formSection" style="display: none;">
           <h2>Criar Novo Usuário</h2>
           <form id="userForm">
             <div class="form-group">
@@ -46,6 +58,7 @@
       <span id="messageText"></span>
       <button id="closeMessage">×</button>
     </div>
+
     <script src="./assets/js/index.js"></script>
   </body>
 </html>

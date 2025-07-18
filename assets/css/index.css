@@ -234,3 +234,39 @@ footer {
     min-width: 100%;
   }
 }
+
+
+
+.plus-button {
+  font-size: 24px;
+  padding: 5px 15px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.top-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+}
+
+.search-box input {
+  padding: 6px 10px;
+  font-size: 14px;
+}
+
+.search-box button {
+  padding: 6px 12px;
+  font-size: 16px;
+  margin-left: 5px;
+  cursor: pointer;
+}
