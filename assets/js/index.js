@@ -208,16 +208,6 @@ function formatTelefone(telefone) {
   }
 }
 
-function validarEmail(email) {
-  const re = /\S+@\S+\.\S+/;
-  return re.test(email);
-}
-
-// No submit do form
-if (!validarEmail(email)) {
-  alert('Email inválido!');
-  return;
-}
 
 // Envio do formulário
 userForm.addEventListener("submit", (e) => {
