@@ -208,7 +208,6 @@ function validarEmail(email) {
   return email.trim().toLowerCase();
 }
 
-
 // Envio do formulário
 userForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -228,11 +227,11 @@ userForm.addEventListener("submit", (e) => {
   let userData = { nome };
 
   if (isEmail) {
-    userData.email = validarEmail(contato);
-    userData.telefone = "telefone não informado"; // Mensagem para telefone
+    userData.email = contato;
+    userData.telefone = null;
   } else {
-    userData.telefone = formatTelefone(contato); // Chamar a função aqui!
-    userData.email = "e-mail não informado"; // Mensagem para email
+    userData.telefone = formatTelefone(contato);
+    userData.email = null;
   }
 
   createUser(userData);
