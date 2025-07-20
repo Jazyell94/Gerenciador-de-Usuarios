@@ -228,10 +228,10 @@ userForm.addEventListener("submit", (e) => {
 
   if (isEmail) {
     userData.email = contato;
-    userData.telefone = null;
+    userData.telefone = "";
   } else {
     userData.telefone = formatTelefone(contato);
-    userData.email = null;
+    userData.email = "";
   }
 
   createUser(userData);
