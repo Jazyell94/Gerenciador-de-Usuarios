@@ -51,20 +51,19 @@ function renderUserList(users, showActions = false) {
       ${
         showActions
           ? `
-      <div class="user-actions">
-        <button class="btn btn-edit" onclick="editUser(${user.id}, '${
+          <div class="user-actions">
+            <button class="btn btn-edit" onclick="editUser(${user.id}, '${
               user.nome
             }', '${user.email}', '${user.telefone}')">Editar</button>
-        <button class="btn btn-delete" onclick="deleteUser(${
-          user.id
-        })">Excluir</button>
-        ${
-          user.status == 1
-            ? `<button class="btn btn-deactivate" onclick="deactivateUser(${user.id})">Desativar</button>`
-            : `<button class="btn btn-reactivate" onclick="reactivateUser(${user.id})">Reativar</button>`
-        }
-      </div>
-    `
+            <button class="btn btn-delete" onclick="deleteUser(${
+              user.id
+            })">Excluir</button>
+            ${
+              user.status == 1
+                ? `<button class="btn btn-deactivate" onclick="deactivateUser(${user.id})">Desativar</button>`
+                : `<button class="btn btn-reactivate" onclick="reactivateUser(${user.id})">Reativar</button>`
+            }
+          </div>`
           : ""
       }
     `;
@@ -98,8 +97,6 @@ async function createUser(userData) {
     submitBtn.textContent = "Criar Usuário";
   }
 }
-
-
 
 // Editar usuário
 async function editUser(id, nome, email, telefone) {
@@ -208,7 +205,6 @@ function formatTelefone(telefone) {
   }
 }
 
-
 // Envio do formulário
 userForm.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -237,8 +233,6 @@ userForm.addEventListener("submit", (e) => {
 
   createUser(userData);
 });
-
-
 
 // Função debounce
 function debounce(func, delay) {
@@ -288,6 +282,3 @@ document
 
 // Inicializar
 document.addEventListener("DOMContentLoaded", fetchUsers);
-
-
-
