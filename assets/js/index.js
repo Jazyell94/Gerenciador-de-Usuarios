@@ -204,6 +204,10 @@ function formatTelefone(telefone) {
     return telefone;
   }
 }
+function validarEmail(email) {
+  return email.trim().toLowerCase();
+}
+
 
 // Envio do formulário
 userForm.addEventListener("submit", (e) => {
@@ -224,7 +228,7 @@ userForm.addEventListener("submit", (e) => {
   let userData = { nome };
 
   if (isEmail) {
-    userData.email = (contato);
+    userData.email = validarEmail(contato);
     userData.telefone = "telefone não informado"; // Mensagem para telefone
   } else {
     userData.telefone = formatTelefone(contato); // Chamar a função aqui!
