@@ -224,7 +224,7 @@ userForm.addEventListener("submit", (e) => {
   let userData = { nome };
 
   if (isEmail) {
-    userData.email = validarEmail(contato);
+    userData.email = (contato);
     userData.telefone = "telefone não informado"; // Mensagem para telefone
   } else {
     userData.telefone = formatTelefone(contato); // Chamar a função aqui!
