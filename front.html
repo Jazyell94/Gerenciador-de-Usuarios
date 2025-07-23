@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anota Aí - Admin</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f8f8f8;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      padding: 2rem;
+    }
+    section {
+      margin-bottom: 2rem;
+    }
+    h2 {
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 0.5rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 0.75rem;
+      text-align: left;
+    }
+    th {
+      background-color: #eee;
+    }
+    button {
+      padding: 0.4rem 0.7rem;
+      cursor: pointer;
+    }
+    #pedido-detalhado {
+      display: none;
+      background: #fff;
+      padding: 1rem;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
+    }
+    canvas {
+      max-width: 600px;
+      margin-top: 1rem;
+    }
+    .filtros {
+      margin-top: 1rem;
+    }
+    .filtros input {
+      margin-right: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Painel de Administração</h1>
+  </header>
+  <main>
+    <section>
+      <h2>Usuários</h2>
+      <table id="usuarios-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>Verificado</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Pedidos</h2>
+      <table id="pedidos-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuário</th>
+            <th>Data</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <div id="pedido-detalhado"></div>
+    </section>
+
+    <section>
+      <h2>Gráfico de Vendas</h2>
+      <div class="filtros">
+        <label for="dataInicio">Início:</label>
+        <input type="date" id="dataInicio">
+        <label for="dataFim">Fim:</label>
+        <input type="date" id="dataFim">
+        <button onclick="filtrarGrafico()">Filtrar</button>
+        <button onclick="exportarPDF()">Exportar PDF</button>
+      </div>
+      <canvas id="graficoVendas"></canvas>
+      <canvas id="graficoProdutos" style="margin-top: 2rem;"></canvas>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script>
+    let chartVendas;
+    let chartProdutos;
+
+    async function carregarUsuarios() {
+      const res = await fetch("/api/usuarios");
+      const usuarios = await res.json();
+      const tbody = document.querySelector("#usuarios-table tbody");
+      tbody.innerHTML = "";
+      usuarios.forEach(u => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${u.nome}</td>
+          <td>${u.email}</td>
+          <td>${u.telefone}</td>
+          <td>${u.verificado ? "Sim" : "Não"}</td>
+          <td>${u.status ? "Ativo" : "Inativo"}</td>
+          <td><button onclick="alternarStatus(${u.id})">${u.status ? "Desativar" : "Ativar"}</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function alternarStatus(id) {
+      await fetch(`/api/usuarios/${id}/status`, { method: "PATCH" });
+      carregarUsuarios();
+    }
+
+    async function carregarPedidos() {
+      const res = await fetch("/api/pedidos");
+      const pedidos = await res.json();
+      const tbody = document.querySelector("#pedidos-table tbody");
+      tbody.innerHTML = "";
+      pedidos.forEach(p => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${p.id}</td>
+          <td>${p.usuario_nome}</td>
+          <td>${new Date(p.data_pedido).toLocaleString()}</td>
+          <td>${p.status}</td>
+          <td><button onclick="verPedido(${p.id})">Detalhes</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function verPedido(pedidoId) {
+      const res = await fetch(`/api/pedidos/${pedidoId}`);
+      const dados = await res.json();
+      const div = document.getElementById("pedido-detalhado");
+      div.style.display = "block";
+      let html = `<h3>Pedido #${dados.pedido.id}</h3>
+        <p><strong>Usuário:</strong> ${dados.pedido.usuario_nome}</p>
+        <p><strong>Data:</strong> ${new Date(dados.pedido.data_pedido).toLocaleString()}</p>
+        <p><strong>Status:</strong> ${dados.pedido.status}</p>
+        <h4>Itens</h4>
+        <ul>`;
+      dados.itens.forEach(i => {
+        html += `<li>${i.nome} - ${i.quantidade} x R$ ${i.preco_unitario.toFixed(2)}</li>`;
+      });
+      html += `</ul>`;
+      div.innerHTML = html;
+    }
+
+    async function carregarGrafico() {
+      const res = await fetch("/api/vendas/mensal");
+      const dados = await res.json();
+      const ctx = document.getElementById("graficoVendas").getContext("2d");
+      chartVendas = new Chart(ctx, {
+        type: "bar",
+        data: {
+          labels: dados.map(d => d.mes),
+          datasets: [{
+            label: "Total em R$",
+            data: dados.map(d => d.total),
+            backgroundColor: "#36a2eb"
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+
+      const resProdutos = await fetch("/api/vendas/top-produtos");
+      const produtos = await resProdutos.json();
+      const ctx2 = document.getElementById("graficoProdutos").getContext("2d");
+      chartProdutos = new Chart(ctx2, {
+        type: "pie",
+        data: {
+          labels: produtos.map(p => p.nome),
+          datasets: [{
+            label: "Mais vendidos",
+            data: produtos.map(p => p.quantidade),
+            backgroundColor: ["#ff6384", "#36a2eb", "#cc65fe", "#ffce56"]
+          }]
+        }
+      });
+    }
+
+    async function filtrarGrafico() {
+      const inicio = document.getElementById("dataInicio").value;
+      const fim = document.getElementById("dataFim").value;
+      if (!inicio || !fim) return alert("Informe ambas as datas.");
+      const res = await fetch(`/api/vendas/mensal?inicio=${inicio}&fim=${fim}`);
+      const dados = await res.json();
+      chartVendas.data.labels = dados.map(d => d.mes);
+      chartVendas.data.datasets[0].data = dados.map(d => d.total);
+      chartVendas.update();
+    }
+
+    function exportarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.text("Relatório de Vendas", 10, 10);
+      doc.addImage(chartVendas.toBase64Image(), "PNG", 10, 20, 180, 80);
+      doc.addPage();
+      doc.text("Produtos Mais Vendidos", 10, 10);
+      doc.addImage(chartProdutos.toBase64Image(), "PNG", 10, 20, 180, 80);
+      doc.save("relatorio.pdf");
+    }
+
+    carregarUsuarios();
+    carregarPedidos();
+    carregarGrafico();
+  </script>
+</body>
+</html>
