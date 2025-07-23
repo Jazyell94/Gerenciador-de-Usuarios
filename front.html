@@ -124,7 +124,7 @@
     let chartProdutos;
 
     async function carregarUsuarios() {
-      const res = await fetch("/api/usuarios");
+      const res = await fetch("https://api-production-554a.up.railway.app/usuarios");
       const usuarios = await res.json();
       const tbody = document.querySelector("#usuarios-table tbody");
       tbody.innerHTML = "";
@@ -148,7 +148,7 @@
     }
 
     async function carregarPedidos() {
-      const res = await fetch("/api/pedidos");
+      const res = await fetch("https://api-production-554a.up.railway.app/pedidos");
       const pedidos = await res.json();
       const tbody = document.querySelector("#pedidos-table tbody");
       tbody.innerHTML = "";
@@ -166,7 +166,7 @@
     }
 
     async function verPedido(pedidoId) {
-      const res = await fetch(`/api/pedidos/${pedidoId}`);
+      const res = await fetch(`https://api-production-554a.up.railway.app/pedidos/${pedidoId}`);
       const dados = await res.json();
       const div = document.getElementById("pedido-detalhado");
       div.style.display = "block";
@@ -184,7 +184,7 @@
     }
 
     async function carregarGrafico() {
-      const res = await fetch("/api/vendas/mensal");
+      const res = await fetch("https://api-production-554a.up.railway.app/vendas/mensal");
       const dados = await res.json();
       const ctx = document.getElementById("graficoVendas").getContext("2d");
       chartVendas = new Chart(ctx, {
@@ -204,7 +204,7 @@
         }
       });
 
-      const resProdutos = await fetch("/api/vendas/top-produtos");
+      const resProdutos = await fetch("https://api-production-554a.up.railway.app/vendas/top-produtos");
       const produtos = await resProdutos.json();
       const ctx2 = document.getElementById("graficoProdutos").getContext("2d");
       chartProdutos = new Chart(ctx2, {
@@ -224,7 +224,7 @@
       const inicio = document.getElementById("dataInicio").value;
       const fim = document.getElementById("dataFim").value;
       if (!inicio || !fim) return alert("Informe ambas as datas.");
-      const res = await fetch(`/api/vendas/mensal?inicio=${inicio}&fim=${fim}`);
+      const res = await fetch(`https://api-production-554a.up.railway.app/vendas/mensal?inicio=${inicio}&fim=${fim}`);
       const dados = await res.json();
       chartVendas.data.labels = dados.map(d => d.mes);
       chartVendas.data.datasets[0].data = dados.map(d => d.total);
